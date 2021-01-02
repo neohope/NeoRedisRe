@@ -40,7 +40,6 @@
 #include "Win32_Time.h"
 #endif
 
-#include "fmacros.h"
 #include "config.h"
 
 #include <stdio.h>

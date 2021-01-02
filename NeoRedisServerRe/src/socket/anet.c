@@ -37,8 +37,6 @@
 #include <Mstcpip.h>
 #endif
 
-#include "../redis/fmacros.h"
-
 #include <sys/types.h>
 #ifndef _WIN32
 #include <sys/socket.h>

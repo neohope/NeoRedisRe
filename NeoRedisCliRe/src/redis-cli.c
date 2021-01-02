@@ -34,8 +34,6 @@
 #include "Win32_Time.h"
 #endif
 
-#include "../../NeoRedisServerRe/src/redis/fmacros.h"
-
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>

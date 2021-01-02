@@ -27,9 +27,6 @@
     <ClCompile Include="src\common\algo\pqsort.c">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="src\common\algo\rand.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="src\common\algo\sha1.c">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -143,9 +140,6 @@
     <ClInclude Include="src\common\algo\pqsort.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="src\common\algo\rand.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="src\common\ds\sds.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -177,9 +171,6 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="src\socket\anet.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="src\redis\fmacros.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="src\redis\util.h">

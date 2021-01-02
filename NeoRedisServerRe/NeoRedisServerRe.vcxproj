@@ -171,7 +171,6 @@
     <ClCompile Include="src\common\algo\lzf_c.c" />
     <ClCompile Include="src\common\algo\lzf_d.c" />
     <ClCompile Include="src\common\algo\pqsort.c" />
-    <ClCompile Include="src\common\algo\rand.c" />
     <ClCompile Include="src\common\algo\sha1.c" />
     <ClCompile Include="src\common\ds\adlist.c" />
     <ClCompile Include="src\common\ds\aof.c" />
@@ -208,7 +207,6 @@
     <ClInclude Include="src\common\algo\lzf.h" />
     <ClInclude Include="src\common\algo\lzfP.h" />
     <ClInclude Include="src\common\algo\pqsort.h" />
-    <ClInclude Include="src\common\algo\rand.h" />
     <ClInclude Include="src\common\algo\sha1.h" />
     <ClInclude Include="src\common\ds\adlist.h" />
     <ClInclude Include="src\common\ds\dict.h" />
@@ -223,7 +221,6 @@
     <ClInclude Include="src\latency\latency.h" />
     <ClInclude Include="src\mem\zmalloc.h" />
     <ClInclude Include="src\redis\config.h" />
-    <ClInclude Include="src\redis\fmacros.h" />
     <ClInclude Include="src\redis\redis.h" />
     <ClInclude Include="src\redis\util.h" />
     <ClInclude Include="src\socket\anet.h" />

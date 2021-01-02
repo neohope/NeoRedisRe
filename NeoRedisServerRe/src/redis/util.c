@@ -36,7 +36,6 @@
 #include <shlwapi.h>    // for PathIsRelative
 #endif
 
-#include "fmacros.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>

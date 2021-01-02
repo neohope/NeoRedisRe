@@ -50,7 +50,6 @@
 #include "Win32_FDAPI.h"
 #endif
 
-#include "../../redis/fmacros.h"
 #include <string.h>
 #include <stdio.h>
 POSIX_ONLY(#include <unistd.h>)
