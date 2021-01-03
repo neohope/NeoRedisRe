@@ -36,7 +36,6 @@
 
 #include "redis.h"
 #include "../common/io/bio.h"
-#include "../latency/latency.h"
 
 #include <time.h>
 #include <signal.h>
@@ -260,7 +259,6 @@ struct redisCommand redisCommandTable[] = {
     {"pfcount",pfcountCommand,-2,"r",0,NULL,1,-1,1,0,0},
     {"pfmerge",pfmergeCommand,-2,"wm",0,NULL,1,-1,1,0,0},
     {"pfdebug",pfdebugCommand,-3,"w",0,NULL,0,0,0,0,0},
-    {"latency",latencyCommand,-2,"arslt",0,NULL,0,0,0,0,0}
 };
 
 struct evictionPoolEntry *evictionPoolAlloc(void);
@@ -799,8 +797,6 @@ void activeExpireCycle(int type) {
             iteration++;
             if ((iteration & 0xf) == 0) { /* check once every 16 iterations. */
                 PORT_LONGLONG elapsed = ustime()-start;
-
-                latencyAddSampleIfNeeded("expire-cycle",elapsed/1000);
                 if (elapsed > timelimit) timelimit_exit = 1;
             }
             if (timelimit_exit) return;
@@ -1576,8 +1572,6 @@ void initServer(void) {
         server.maxmemory = 3072LL*(1024*1024); /* 3 GB */
         server.maxmemory_policy = REDIS_MAXMEMORY_NO_EVICTION;
     }
-
-    latencyMonitorInit();
     bioInit();
 }
 
@@ -1739,11 +1733,6 @@ void call(redisClient *c, int flags) {
 
     /* Log the command into the Slow log if needed, and populate the
      * per-command statistics that we show in INFO commandstats. */
-    if (flags & REDIS_CALL_SLOWLOG && c->cmd->proc != execCommand) {
-        char *latency_event = (c->cmd->flags & REDIS_CMD_FAST) ?
-                              "fast-command" : "command";
-        latencyAddSampleIfNeeded(latency_event,duration/1000);
-    }
     if (flags & REDIS_CALL_STATS) {
         c->cmd->microseconds += duration;
         c->cmd->calls++;
@@ -2497,7 +2486,6 @@ int freeMemoryIfNeeded(void) {
     /* Compute how much memory we need to free. */
     mem_tofree = mem_used - (size_t)server.maxmemory;                           WIN_PORT_FIX /* cast (size_t) */
     mem_freed = 0;
-    latencyStartMonitor(latency);
     while (mem_freed < mem_tofree) {
         int j, k, keys_freed = 0;
 
@@ -2595,11 +2583,7 @@ int freeMemoryIfNeeded(void) {
                  * AOF and Output buffer memory will be freed eventually so
                  * we only care about memory used by the key space. */
                 delta = (PORT_LONGLONG) zmalloc_used_memory();
-                latencyStartMonitor(eviction_latency);
                 dbDelete(db,keyobj);
-                latencyEndMonitor(eviction_latency);
-                latencyAddSampleIfNeeded("eviction-del",eviction_latency);
-                latencyRemoveNestedEvent(latency,eviction_latency);
                 delta -= (PORT_LONGLONG) zmalloc_used_memory();
                 mem_freed += delta;
                 server.stat_evictedkeys++;
@@ -2608,13 +2592,9 @@ int freeMemoryIfNeeded(void) {
             }
         }
         if (!keys_freed) {
-            latencyEndMonitor(latency);
-            latencyAddSampleIfNeeded("eviction-cycle",latency);
             return REDIS_ERR; /* nothing to free... */
         }
     }
-    latencyEndMonitor(latency);
-    latencyAddSampleIfNeeded("eviction-cycle",latency);
     return REDIS_OK;
 }
 

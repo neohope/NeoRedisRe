@@ -66,7 +66,6 @@ typedef PORT_LONGLONG mstime_t; /* millisecond time type. */
 #include "../common/ds/ziplist.h" /* Compact list data structure */
 #include "../common/ds/intset.h"  /* Compact integer set structure */
 #include "util.h"    /* Misc functions useful in many places */
-#include "../latency/latency.h" /* Latency monitor API */
 
 /* Error codes */
 #define REDIS_OK                0
@@ -1249,7 +1248,6 @@ void pfaddCommand(redisClient *c);
 void pfcountCommand(redisClient *c);
 void pfmergeCommand(redisClient *c);
 void pfdebugCommand(redisClient *c);
-void latencyCommand(redisClient *c);
 
 #if defined(__GNUC__)
 void *calloc(size_t count, size_t size) __attribute__ ((deprecated));
