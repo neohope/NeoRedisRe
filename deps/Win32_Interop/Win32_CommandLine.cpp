@@ -303,9 +303,6 @@ static RedisParamterMapper g_redisArgMap =
     { "databases",                      &fp1 },    // databases [number]
     { "save",                           &savep },  // save [seconds] [changes] or save ""
     { "stop-writes-on-bgsave-error",    &fp1 },    // stop-writes-on-bgsave-error [yes/no] 
-    { "rdbcompression",                 &fp1 },    // rdbcompression [yes/no]
-    { "rdbchecksum",                    &fp1 },    // rdbchecksum [yes/no]
-    { "dbfilename",                     &fp1 },    // dbfilename [filename]
     { cDir,                             &fp1 },    // dir [path]
     { "requirepass",                    &fp1 },    // requirepass [string]
     { "rename-command",                 &fp2 },    // rename-command [command] [string]

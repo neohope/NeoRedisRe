@@ -124,13 +124,11 @@ static struct config {
     PORT_LONGLONG lru_test_sample_size;
     int pipe_mode;
     int pipe_timeout;
-    int getrdb_mode;
     int stat_mode;
     int scan_mode;
     int intrinsic_latency_mode;
     int intrinsic_latency_duration;
     char *pattern;
-    char *rdb_filename;
     int bigkeys;
     int stdinarg; /* get last arg from stdin. (-x option) */
     char *auth;
@@ -779,9 +777,6 @@ static int parseOptions(int argc, char **argv) {
         } else if (!strcmp(argv[i],"--intrinsic-latency") && !lastarg) {
             config.intrinsic_latency_mode = 1;
             config.intrinsic_latency_duration = atoi(argv[++i]);
-        } else if (!strcmp(argv[i],"--rdb") && !lastarg) {
-            config.getrdb_mode = 1;
-            config.rdb_filename = argv[++i];
         } else if (!strcmp(argv[i],"--pipe")) {
             config.pipe_mode = 1;
         } else if (!strcmp(argv[i],"--pipe-timeout") && !lastarg) {
@@ -855,7 +850,6 @@ static void usage(void) {
 "  --latency-dist     Shows latency as a spectrum, requires xterm 256 colors.\n"
 "                     Default time interval is 1 sec. Change it using -i.\n"
 "  --lru-test <keys>  Simulate a cache workload with an 80-20 distribution.\n"
-"  --rdb <filename>   Transfer an RDB dump from remote server to local file.\n"
 "  --pipe             Transfer raw Redis protocol from stdin to server.\n"
 "  --pipe-timeout <n> In --pipe mode, abort with error if after sending all data.\n"
 "                     no reply is received within <n> seconds.\n"
@@ -1185,94 +1179,6 @@ static void latencyDistMode(void) {
         }
         usleep(LATENCY_SAMPLE_RATE * 1000);
     }
-}
-
-/*------------------------------------------------------------------------------
- * Slave mode
- *--------------------------------------------------------------------------- */
-
-/* Sends SYNC and reads the number of bytes in the payload. Used both by
- * slaveMode() and getRDB(). */
-PORT_ULONGLONG sendSync(int fd) {
-    /* To start we need to send the SYNC command and return the payload.
-     * The hiredis client lib does not understand this part of the protocol
-     * and we don't want to mess with its buffers, so everything is performed
-     * using direct low-level I/O. */
-    char buf[4096], *p;
-    ssize_t nread;
-
-    /* Send the SYNC command. */
-    if (write(fd,"SYNC\r\n",6) != 6) {
-        fprintf(stderr,"Error writing to master\n");
-        exit(1);
-    }
-
-    /* Read $<payload>\r\n, making sure to read just up to "\n" */
-    p = buf;
-    while(1) {
-        nread = read(fd,p,1);
-        if (nread <= 0) {
-            fprintf(stderr,"Error reading bulk length while SYNCing\n");
-            exit(1);
-        }
-        if (*p == '\n' && p != buf) break;
-        if (*p != '\n') p++;
-    }
-    *p = '\0';
-    if (buf[0] == '-') {
-        printf("SYNC with master failed: %s\n", buf);
-        exit(1);
-    }
-    return strtoull(buf+1,NULL,10);
-}
-
-/*------------------------------------------------------------------------------
- * RDB transfer mode
- *--------------------------------------------------------------------------- */
-
-/* This function implements --rdb, so it uses the replication protocol in order
- * to fetch the RDB file from a remote server. */
-static void getRDB(void) {
-    int s = context->fd;
-    int fd;
-    PORT_ULONGLONG payload = sendSync(s);
-    char buf[4096];
-
-    fprintf(stderr,"SYNC sent to master, writing %llu bytes to '%s'\n",
-        payload, config.rdb_filename);
-
-    /* Write to file. */
-    if (!strcmp(config.rdb_filename,"-")) {
-        fd = STDOUT_FILENO;
-    } else {
-        fd = open(config.rdb_filename, O_CREAT|O_WRONLY, 0644);
-        if (fd == -1) {
-            fprintf(stderr, "Error opening '%s': %s\n", config.rdb_filename,
-                strerror(errno));
-            exit(1);
-        }
-    }
-
-    while(payload) {
-        ssize_t nread, nwritten;
-
-        nread = read(s,buf,(payload > sizeof(buf)) ? sizeof(buf) : payload);
-        if (nread <= 0) {
-            fprintf(stderr,"I/O Error reading RDB payload from socket\n");
-            exit(1);
-        }
-        nwritten = write(fd, buf, nread);
-        if (nwritten != nread) {
-            fprintf(stderr,"Error writing data to file: %s\n",
-                strerror(errno));
-            exit(1);
-        }
-        payload -= nread;
-    }
-    close(s); /* Close the file descriptor ASAP as fsync() may take time. */
-    fsync(fd);
-    fprintf(stderr,"Transfer finished with success.\n");
-    exit(0);
 }
 
 /*------------------------------------------------------------------------------
@@ -2080,12 +1986,10 @@ int main(int argc, char **argv) {
     config.latency_history = 0;
     config.lru_test_mode = 0;
     config.lru_test_sample_size = 0;
-    config.getrdb_mode = 0;
     config.stat_mode = 0;
     config.scan_mode = 0;
     config.intrinsic_latency_mode = 0;
     config.pattern = NULL;
-    config.rdb_filename = NULL;
     config.pipe_mode = 0;
     config.pipe_timeout = REDIS_CLI_DEFAULT_PIPE_TIMEOUT;
     config.bigkeys = 0;
@@ -2117,12 +2021,6 @@ int main(int argc, char **argv) {
     if (config.latency_dist_mode) {
         if (cliConnect(0) == REDIS_ERR) exit(1);
         latencyDistMode();
-    }
-
-    /* Get RDB mode. */
-    if (config.getrdb_mode) {
-        if (cliConnect(0) == REDIS_ERR) exit(1);
-        getRDB();
     }
 
     /* Pipe mode */
