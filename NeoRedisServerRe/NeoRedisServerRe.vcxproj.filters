@@ -18,12 +18,6 @@
     <ClCompile Include="src\common\algo\bitops.c">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="src\common\algo\lzf_c.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="src\common\algo\lzf_d.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="src\common\algo\pqsort.c">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -120,12 +114,6 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="src\common\ds\intset.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="src\common\algo\lzf.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="src\common\algo\lzfP.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="src\common\algo\pqsort.h">
