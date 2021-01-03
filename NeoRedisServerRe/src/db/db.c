@@ -227,11 +227,9 @@ int selectDb(redisClient *c, int id) {
  *----------------------------------------------------------------------------*/
 
 void signalModifiedKey(redisDb *db, robj *key) {
-    touchWatchedKey(db,key);
 }
 
 void signalFlushedDb(int dbid) {
-    touchWatchedKeysOnFlush(dbid);
 }
 
 /*-----------------------------------------------------------------------------

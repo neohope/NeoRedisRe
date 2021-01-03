@@ -75,9 +75,6 @@
     <ClCompile Include="src\socket\networking.c">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="src\socket\multi.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="src\socket\blocked.c">
       <Filter>源文件</Filter>
     </ClCompile>

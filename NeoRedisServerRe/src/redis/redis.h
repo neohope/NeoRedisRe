@@ -903,15 +903,7 @@ void handleClientsBlockedOnLists(void);
 void popGenericCommand(redisClient *c, int where);
 void signalListAsReady(redisDb *db, robj *key);
 
-/* MULTI/EXEC/WATCH... */
-void unwatchAllKeys(redisClient *c);
-void initClientMultiState(redisClient *c);
-void freeClientMultiState(redisClient *c);
-void queueMultiCommand(redisClient *c);
-void touchWatchedKey(redisDb *db, robj *key);
-void touchWatchedKeysOnFlush(int dbid);
-void discardTransaction(redisClient *c);
-void flagTransaction(redisClient *c);
+/* MULTI/EXEC/WATCH... removed*/
 
 /* Redis object implementation */
 void decrRefCount(robj *o);
@@ -1206,9 +1198,6 @@ void zremCommand(redisClient *c);
 void zscoreCommand(redisClient *c);
 void zremrangebyscoreCommand(redisClient *c);
 void zremrangebylexCommand(redisClient *c);
-void multiCommand(redisClient *c);
-void execCommand(redisClient *c);
-void discardCommand(redisClient *c);
 void blpopCommand(redisClient *c);
 void brpopCommand(redisClient *c);
 void brpoplpushCommand(redisClient *c);
@@ -1235,8 +1224,6 @@ void hscanCommand(redisClient *c);
 void configCommand(redisClient *c);
 void hincrbyCommand(redisClient *c);
 void hincrbyfloatCommand(redisClient *c);
-void watchCommand(redisClient *c);
-void unwatchCommand(redisClient *c);
 void objectCommand(redisClient *c);
 void clientCommand(redisClient *c);
 void timeCommand(redisClient *c);

@@ -121,7 +121,6 @@ redisClient *createClient(int fd) {
     c->watched_keys = listCreate();
     c->peerid = NULL;
     if (fd != -1) listAddNodeTail(server.clients,c);
-    initClientMultiState(c);
     return c;
 }
 
@@ -663,7 +662,6 @@ void freeClient(redisClient *c) {
     dictRelease(c->bpop.keys);
 
     /* UNWATCH all the keys */
-    unwatchAllKeys(c);
     listRelease(c->watched_keys);
 
     /* Close socket, unregister events, and remove list of replies and
@@ -700,7 +698,6 @@ void freeClient(redisClient *c) {
      * and finally release the client structure itself. */
     if (c->name) decrRefCount(c->name);
     zfree(c->argv);
-    freeClientMultiState(c);
     sdsfree(c->peerid);
     zfree(c);
 }

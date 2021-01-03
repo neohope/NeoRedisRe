@@ -191,7 +191,6 @@
     <ClCompile Include="src\redis\util.c" />
     <ClCompile Include="src\socket\anet.c" />
     <ClCompile Include="src\socket\blocked.c" />
-    <ClCompile Include="src\socket\multi.c" />
     <ClCompile Include="src\socket\networking.c" />
   </ItemGroup>
   <ItemGroup>
