@@ -232,8 +232,6 @@ struct redisCommand redisCommandTable[] = {
     {"auth",authCommand,2,"rsltF",0,NULL,0,0,0,0,0},
     {"ping",pingCommand,-1,"rtF",0,NULL,0,0,0,0,0},
     {"echo",echoCommand,2,"rF",0,NULL,0,0,0,0,0},
-    {"save",saveCommand,1,"ars",0,NULL,0,0,0,0,0},
-    {"bgsave",bgsaveCommand,1,"ar",0,NULL,0,0,0,0,0},
     {"bgrewriteaof",bgrewriteaofCommand,1,"ar",0,NULL,0,0,0,0,0},
     {"shutdown",shutdownCommand,-1,"arlt",0,NULL,0,0,0,0,0},
     {"lastsave",lastsaveCommand,1,"rRF",0,NULL,0,0,0,0,0},
@@ -1105,8 +1103,6 @@ int serverCron(struct aeEventLoop *eventLoop, PORT_LONGLONG id, void *clientData
                 EndForkOperation(&exitCode);
                 ResumeFromSuspension();
                 if (server.rdb_child_pid != -1) {
-                    backgroundSaveDoneHandler(exitCode, bySignal);
-                } else {
                     backgroundRewriteDoneHandler(exitCode, bySignal);
                 }
                 updateDictResizePolicy();
@@ -1135,28 +1131,6 @@ int serverCron(struct aeEventLoop *eventLoop, PORT_LONGLONG id, void *clientData
         }
 #endif
     } else {
-        /* If there is not a background saving/rewrite in progress check if
-         * we have to save/rewrite now */
-         for (j = 0; j < server.saveparamslen; j++) {
-            struct saveparam *sp = server.saveparams+j;
-
-            /* Save if we reached the given amount of changes,
-             * the given amount of seconds, and if the latest bgsave was
-             * successful or if, in case of an error, at least
-             * REDIS_BGSAVE_RETRY_DELAY seconds already elapsed. */
-            if (server.dirty >= sp->changes &&
-                server.unixtime-server.lastsave > sp->seconds &&
-                (server.unixtime-server.lastbgsave_try >
-                 REDIS_BGSAVE_RETRY_DELAY ||
-                 server.lastbgsave_status == REDIS_OK))
-            {
-                redisLog(REDIS_NOTICE,"%d changes in %d seconds. Saving...",
-                    sp->changes, (int)sp->seconds);
-                rdbSaveBackground(server.rdb_filename);
-                break;
-            }
-         }
-
          /* Trigger an AOF rewrite if needed */
          if (server.rdb_child_pid == -1 &&
              server.aof_child_pid == -1 &&
@@ -2078,14 +2052,7 @@ int prepareForShutdown(int flags) {
     int nosave = flags & REDIS_SHUTDOWN_NOSAVE;
 
     redisLog(REDIS_WARNING,"User requested shutdown...");
-    /* Kill the saving child if there is a background saving in progress.
-       We want to avoid race conditions, for instance our saving child may
-       overwrite the synchronous saving did by SHUTDOWN. */
-    if (server.rdb_child_pid != -1) {
-        redisLog(REDIS_WARNING,"There is a child saving an .rdb. Killing it!");
-        IF_WIN32(AbortForkOperation(), kill(server.rdb_child_pid,SIGUSR1));
-        rdbRemoveTempFile(server.rdb_child_pid);
-    }
+
     if (server.aof_state != REDIS_AOF_OFF) {
         /* Kill the AOF saving child as the AOF we already have may be longer
          * but contains the full dataset anyway. */
@@ -2103,19 +2070,6 @@ int prepareForShutdown(int flags) {
         /* Append only file: fsync() the AOF and exit */
         redisLog(REDIS_NOTICE,"Calling fsync() on the AOF file.");
         aof_fsync(server.aof_fd);
-    }
-    if ((server.saveparamslen > 0 && !nosave) || save) {
-        redisLog(REDIS_NOTICE,"Saving the final RDB snapshot before exiting.");
-        /* Snapshotting. Perform a SYNC SAVE and exit */
-        if (rdbSave(server.rdb_filename) != REDIS_OK) {
-            /* Ooops.. error saving! The best we can do is to continue
-             * operating. Note that if there was a background saving process,
-             * in the next cron() Redis will be notified that the background
-             * saving aborted, handling special stuff like slaves pending for
-             * synchronization... */
-            redisLog(REDIS_WARNING,"Error trying to save the DB, can't exit.");
-            return REDIS_ERR;
-        }
     }
     if (server.daemonize) {
         redisLog(REDIS_NOTICE,"Removing the pid file.");
@@ -3052,7 +3006,6 @@ static void sigShutdownHandler(int sig) {
      * on disk. */
     if (server.shutdown_asap && sig == SIGINT) {
         redisLogFromHandler(REDIS_WARNING, "You insist... exiting now.");
-        rdbRemoveTempFile(getpid());
         exit(1); /* Exit with an error since this was not a clean shutdown. */
     } else if (server.loading) {
         exit(0);
@@ -3083,23 +3036,6 @@ void setupSignalHandlers(void) {
     sigaction(SIGILL, &act, NULL);
 #endif
     return;
-}
-
-/* Function called at startup to load RDB or AOF file in memory. */
-void loadDataFromDisk(void) {
-    PORT_LONGLONG start = ustime();
-    if (server.aof_state == REDIS_AOF_ON) {
-        if (loadAppendOnlyFile(server.aof_filename) == REDIS_OK)
-            redisLog(REDIS_NOTICE,"DB loaded from append only file: %.3f seconds",(float)(ustime()-start)/1000000);
-    } else {
-        if (rdbLoad(server.rdb_filename) == REDIS_OK) {
-            redisLog(REDIS_NOTICE,"DB loaded from disk: %.3f seconds",
-                (float)(ustime()-start)/1000000);
-        } else if (errno != ENOENT) {
-            redisLog(REDIS_WARNING,"Fatal error loading the DB: %s. Exiting.",strerror(errno));
-            exit(1);
-        }
-    }
 }
 
 void redisOutOfMemoryHandler(size_t allocation_size) {
@@ -3187,7 +3123,6 @@ int main(int argc, char **argv) {
 #ifdef __linux__
     linuxMemoryWarnings();
 #endif
-    loadDataFromDisk();
     if (server.ipfd_count > 0)
         redisLog(REDIS_NOTICE,"The server is now ready to accept connections on port %d", server.port);
     if (server.sofd > 0)

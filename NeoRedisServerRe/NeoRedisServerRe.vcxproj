@@ -183,7 +183,6 @@
     <ClCompile Include="src\common\io\rio.c" />
     <ClCompile Include="src\common\io\syncio.c" />
     <ClCompile Include="src\db\db.c" />
-    <ClCompile Include="src\db\rdb.c" />
     <ClCompile Include="src\event\ae.c" />
     <ClCompile Include="src\latency\latency.c" />
     <ClCompile Include="src\mem\zmalloc.c" />
@@ -216,7 +215,6 @@
     <ClInclude Include="src\common\ds\zipmap.h" />
     <ClInclude Include="src\common\io\bio.h" />
     <ClInclude Include="src\common\io\rio.h" />
-    <ClInclude Include="src\db\rdb.h" />
     <ClInclude Include="src\event\ae.h" />
     <ClInclude Include="src\latency\latency.h" />
     <ClInclude Include="src\mem\zmalloc.h" />

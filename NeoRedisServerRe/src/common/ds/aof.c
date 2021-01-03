@@ -631,7 +631,6 @@ int loadAppendOnlyFile(char *filename) {
     server.aof_state = REDIS_AOF_OFF;
 
     fakeClient = createFakeClient();
-    startLoading(fp);
 
     while(1) {
         int argc, j;
@@ -643,7 +642,6 @@ int loadAppendOnlyFile(char *filename) {
 
         /* Serve the clients from time to time */
         if (!(loops++ % 1000)) {
-            loadingProgress((off_t)ftello(fp));                                 WIN_PORT_FIX /* cast (off_t) */
             processEventsWhileBlocked();
         }
 
@@ -712,7 +710,6 @@ loaded_ok: /* DB loaded, cleanup and return REDIS_OK to the caller. */
     fclose(fp);
     freeFakeClient(fakeClient);
     server.aof_state = old_aof_state;
-    stopLoading();
     aofUpdateCurrentSize();
     server.aof_rewrite_base_size = server.aof_current_size;
     return REDIS_OK;

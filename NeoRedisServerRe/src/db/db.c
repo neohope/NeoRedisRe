@@ -260,15 +260,8 @@ void flushallCommand(redisClient *c) {
 #else
         kill(server.rdb_child_pid,SIGUSR1);
 #endif
-        rdbRemoveTempFile(server.rdb_child_pid);
     }
-    if (server.saveparamslen > 0) {
-        /* Normally rdbSave() will reset dirty, but we don't want this here
-         * as otherwise FLUSHALL will not be replicated nor put into the AOF. */
-        PORT_LONGLONG saved_dirty = server.dirty;                               /* UPSTREAM_FIX: server.dirty is a PORT_LONGLONG not an int */
-        rdbSave(server.rdb_filename);
-        server.dirty = saved_dirty;
-    }
+
     server.dirty++;
 }
 

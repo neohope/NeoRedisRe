@@ -31,18 +31,6 @@ void SetupRedisGlobals(LPVOID redisData, size_t redisDataSize, uint32_t dictHash
 #endif
 }
 
-int do_rdbSave(char* filename)
-{
-#ifndef NO_QFORKIMPL
-    server.rdb_child_pid = GetCurrentProcessId();
-    if( rdbSave(filename) != REDIS_OK ) {
-        redisLog(REDIS_WARNING,"rdbSave failed in qfork: %s", strerror(errno));
-        return REDIS_ERR;
-    }
-#endif
-    return REDIS_OK;
-}
-
 int do_aofSave(char* filename, int aof_pipe_read_ack, int aof_pipe_read_data, int aof_pipe_write_ack)
 {
 #ifndef NO_QFORKIMPL
@@ -62,6 +50,4 @@ int do_aofSave(char* filename, int aof_pipe_read_ack, int aof_pipe_read_data, in
 #endif
     return REDIS_OK;
 }
-
-int rdbSaveRioWithEOFMark(rio *rdb, int *error);
 

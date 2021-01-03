@@ -1008,13 +1008,9 @@ ssize_t syncWrite(int fd, char *ptr, ssize_t size, PORT_LONGLONG timeout);
 ssize_t syncRead(int fd, char *ptr, ssize_t size, PORT_LONGLONG timeout);
 ssize_t syncReadLine(int fd, char *ptr, ssize_t size, PORT_LONGLONG timeout);
 
-/* Generic persistence functions */
-void startLoading(FILE *fp);
-void loadingProgress(off_t pos);
-void stopLoading(void);
+/* Generic persistence functions removed*/
 
-/* RDB persistence */
-#include "../db/rdb.h"
+/* RDB removed */
 
 /* AOF persistence */
 void flushAppendOnlyFile(int force);
@@ -1204,8 +1200,6 @@ void keysCommand(redisClient *c);
 void scanCommand(redisClient *c);
 void dbsizeCommand(redisClient *c);
 void lastsaveCommand(redisClient *c);
-void saveCommand(redisClient *c);
-void bgsaveCommand(redisClient *c);
 void bgrewriteaofCommand(redisClient *c);
 void shutdownCommand(redisClient *c);
 void moveCommand(redisClient *c);
