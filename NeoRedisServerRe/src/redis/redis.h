@@ -824,7 +824,6 @@ extern dictType replScriptCacheDictType;
 /* Utils */
 PORT_LONGLONG ustime(void);
 PORT_LONGLONG mstime(void);
-void getRandomHexChars(char *p, unsigned int len);
 void exitFromChild(int retcode);
 size_t redisPopcount(void *s, PORT_LONG count);
 void redisSetProcTitle(char *title);

@@ -169,7 +169,6 @@
   <ItemGroup>
     <ClCompile Include="src\common\algo\bitops.c" />
     <ClCompile Include="src\common\algo\pqsort.c" />
-    <ClCompile Include="src\common\algo\sha1.c" />
     <ClCompile Include="src\common\ds\adlist.c" />
     <ClCompile Include="src\common\ds\dict.c" />
     <ClCompile Include="src\common\ds\intset.c" />
@@ -195,7 +194,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\common\algo\pqsort.h" />
-    <ClInclude Include="src\common\algo\sha1.h" />
     <ClInclude Include="src\common\ds\adlist.h" />
     <ClInclude Include="src\common\ds\dict.h" />
     <ClInclude Include="src\common\ds\intset.h" />

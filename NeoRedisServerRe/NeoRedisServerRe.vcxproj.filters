@@ -21,9 +21,6 @@
     <ClCompile Include="src\common\algo\pqsort.c">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="src\common\algo\sha1.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="src\common\ds\adlist.c">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -105,9 +102,6 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="src\common\ds\sds.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="src\common\algo\sha1.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="src\common\ds\ziplist.h">

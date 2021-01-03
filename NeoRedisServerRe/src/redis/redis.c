@@ -1164,8 +1164,6 @@ void createSharedObjects(void) {
 
 void initServerConfig(void) {
     int j;
-
-    getRandomHexChars(server.runid,REDIS_RUN_ID_SIZE);
     server.configfile = NULL;
     server.hz = REDIS_DEFAULT_HZ;
     server.runid[REDIS_RUN_ID_SIZE] = '\0';
