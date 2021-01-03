@@ -102,9 +102,6 @@
     <ClCompile Include="src\redis\util.c">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="src\common\ds\aof.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="src\common\io\rio.c">
       <Filter>源文件</Filter>
     </ClCompile>

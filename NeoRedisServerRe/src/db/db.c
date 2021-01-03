@@ -784,9 +784,6 @@ void propagateExpire(redisDb *db, robj *key) {
     incrRefCount(argv[0]);
     incrRefCount(argv[1]);
 
-    if (server.aof_state != REDIS_AOF_OFF)
-        feedAppendOnlyFile(server.delCommand,db->id,argv,2);
-
     decrRefCount(argv[0]);
     decrRefCount(argv[1]);
 }

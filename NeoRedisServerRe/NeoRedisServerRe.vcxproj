@@ -173,7 +173,6 @@
     <ClCompile Include="src\common\algo\pqsort.c" />
     <ClCompile Include="src\common\algo\sha1.c" />
     <ClCompile Include="src\common\ds\adlist.c" />
-    <ClCompile Include="src\common\ds\aof.c" />
     <ClCompile Include="src\common\ds\dict.c" />
     <ClCompile Include="src\common\ds\intset.c" />
     <ClCompile Include="src\common\ds\sds.c" />

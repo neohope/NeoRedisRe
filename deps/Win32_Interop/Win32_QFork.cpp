@@ -333,14 +333,6 @@ BOOL QForkChildInit(HANDLE QForkControlMemoryMapHandle, DWORD ParentProcessID) {
         // Execute requested operation
         if (g_pQForkControl->typeOfOperation == OperationType::otRDB) {
         } else if (g_pQForkControl->typeOfOperation == OperationType::otAOF) {
-            int aof_pipe_read_ack = FDAPI_open_osfhandle((intptr_t) g_pQForkControl->globalData.aof_pipe_read_ack_handle, _O_APPEND);
-            int aof_pipe_read_data = FDAPI_open_osfhandle((intptr_t) g_pQForkControl->globalData.aof_pipe_read_data_handle, _O_APPEND);
-            int aof_pipe_write_ack = FDAPI_open_osfhandle((intptr_t) g_pQForkControl->globalData.aof_pipe_write_ack_handle, _O_APPEND);
-            g_ChildExitCode = do_aofSave(g_pQForkControl->globalData.filename,
-                                         aof_pipe_read_ack,
-                                         aof_pipe_read_data,
-                                         aof_pipe_write_ack
-                                         );
         } else {
             throw runtime_error("unexpected operation type");
         }

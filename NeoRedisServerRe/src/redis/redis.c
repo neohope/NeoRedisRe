@@ -232,7 +232,6 @@ struct redisCommand redisCommandTable[] = {
     {"auth",authCommand,2,"rsltF",0,NULL,0,0,0,0,0},
     {"ping",pingCommand,-1,"rtF",0,NULL,0,0,0,0,0},
     {"echo",echoCommand,2,"rF",0,NULL,0,0,0,0,0},
-    {"bgrewriteaof",bgrewriteaofCommand,1,"ar",0,NULL,0,0,0,0,0},
     {"shutdown",shutdownCommand,-1,"arlt",0,NULL,0,0,0,0,0},
     {"lastsave",lastsaveCommand,1,"rRF",0,NULL,0,0,0,0,0},
     {"type",typeCommand,2,"rF",0,NULL,1,1,1,0,0},
@@ -1082,14 +1081,6 @@ int serverCron(struct aeEventLoop *eventLoop, PORT_LONGLONG id, void *clientData
     /* Handle background operations on Redis databases. */
     databasesCron();
 
-    /* Start a scheduled AOF rewrite if this was requested by the user while
-     * a BGSAVE was in progress. */
-    if (server.rdb_child_pid == -1 && server.aof_child_pid == -1 &&
-        server.aof_rewrite_scheduled)
-    {
-        rewriteAppendOnlyFileBackground();
-    }
-
     /* Check if a background saving or AOF rewrite in progress terminated. */
     if (server.rdb_child_pid != -1 || server.aof_child_pid != -1) {
 #ifdef _WIN32
@@ -1102,9 +1093,6 @@ int serverCron(struct aeEventLoop *eventLoop, PORT_LONGLONG id, void *clientData
                 redisLog(REDIS_WARNING, (bySignal ? "fork operation failed" : "fork operation complete"));
                 EndForkOperation(&exitCode);
                 ResumeFromSuspension();
-                if (server.rdb_child_pid != -1) {
-                    backgroundRewriteDoneHandler(exitCode, bySignal);
-                }
                 updateDictResizePolicy();
             }
         }
@@ -1140,25 +1128,7 @@ int serverCron(struct aeEventLoop *eventLoop, PORT_LONGLONG id, void *clientData
             PORT_LONGLONG base = server.aof_rewrite_base_size ?
                             server.aof_rewrite_base_size : 1;
             PORT_LONGLONG growth = (server.aof_current_size*100/base) - 100;
-            if (growth >= server.aof_rewrite_perc) {
-                redisLog(REDIS_NOTICE,"Starting automatic rewriting of AOF on %lld%% growth",growth);
-                rewriteAppendOnlyFileBackground();
-            }
          }
-    }
-
-
-    /* AOF postponed flush: Try at every cron cycle if the slow fsync
-     * completed. */
-    if (server.aof_flush_postponed_start) flushAppendOnlyFile(0);
-
-    /* AOF write errors: in this case we have a buffer to flush as well and
-     * clear the AOF error in case of success to make the DB writable again,
-     * however to try every second is enough in case of 'hz' is set to
-     * an higher frequency. */
-    run_with_period(1000) {
-        if (server.aof_last_write_status == REDIS_ERR)
-            flushAppendOnlyFile(0);
     }
 
     /* Close clients that need to be closed asynchronous */
@@ -1177,12 +1147,6 @@ int serverCron(struct aeEventLoop *eventLoop, PORT_LONGLONG id, void *clientData
 void beforeSleep(struct aeEventLoop *eventLoop) {
     REDIS_NOTUSED(eventLoop);
 
-#ifdef WIN32
-    //1) check if child has signaled parent to stop sending diffs
-    //2) check if more data can be written to the child and write it
-    aofProcessDiffRewriteEvents(eventLoop);
-#endif
-
     /* Run a fast expire cycle (the called function will return
      * ASAP if a fast cycle is not needed). */
     if (server.active_expire_enabled)
@@ -1191,9 +1155,6 @@ void beforeSleep(struct aeEventLoop *eventLoop) {
     /* Try to process pending commands for clients that were just unblocked. */
     if (listLength(server.unblocked_clients))
         processUnblockedClients();
-
-    /* Write the AOF buffer on disk */
-    flushAppendOnlyFile(0);
 }
 
 /* =========================== Server initialization ======================== */
@@ -1664,7 +1625,7 @@ void initServer(void) {
     server.rdb_child_pid = -1;
     server.aof_child_pid = -1;
     server.rdb_child_type = REDIS_RDB_CHILD_TYPE_NONE;
-    aofRewriteBufferReset();
+
     server.aof_buf = sdsempty();
     server.lastsave = time(NULL); /* At startup we consider the DB saved. */
     server.lastbgsave_try = 0;    /* At startup we never tried to BGSAVE. */
@@ -1856,8 +1817,6 @@ struct redisCommand *lookupCommandOrOriginal(sds name) {
 void propagate(struct redisCommand *cmd, int dbid, robj **argv, int argc,
                int flags)
 {
-    if (server.aof_state != REDIS_AOF_OFF && flags & REDIS_PROPAGATE_AOF)
-        feedAppendOnlyFile(cmd,dbid,argv,argc);
 }
 
 /* Used inside commands to schedule the propagation of additional commands
@@ -2453,24 +2412,6 @@ sds genRedisInfoString(char *section) {
             (server.aof_lastbgrewrite_status == REDIS_OK) ? "ok" : "err",
             (server.aof_last_write_status == REDIS_OK) ? "ok" : "err");
 
-        if (server.aof_state != REDIS_AOF_OFF) {
-            info = sdscatprintf(info,
-                "aof_current_size:%lld\r\n"
-                "aof_base_size:%lld\r\n"
-                "aof_pending_rewrite:%d\r\n"
-                "aof_buffer_length:%Iu\r\n"                                     WIN_PORT_FIX /* %zu -> %Iu */
-                "aof_rewrite_buffer_length:%Iu\r\n"                             WIN_PORT_FIX /* %lu -> %Iu */
-                "aof_pending_bio_fsync:%llu\r\n"
-                "aof_delayed_fsync:%Iu\r\n",                                    WIN_PORT_FIX /* %lu -> %Iu */
-                (PORT_LONGLONG) server.aof_current_size,
-                (PORT_LONGLONG) server.aof_rewrite_base_size,
-                server.aof_rewrite_scheduled,
-                sdslen(server.aof_buf),
-                aofRewriteBufferSize(),
-                bioPendingJobsOfType(REDIS_BIO_AOF_FSYNC),
-                server.aof_delayed_fsync);
-        }
-
         if (server.loading) {
             double perc;
             time_t eta, elapsed;
@@ -2742,7 +2683,6 @@ int freeMemoryIfNeeded(void) {
     mem_used = zmalloc_used_memory();
     if (server.aof_state != REDIS_AOF_OFF) {
         mem_used -= sdslen(server.aof_buf);
-        mem_used -= aofRewriteBufferSize();
     }
 
     /* Check if we are over the memory limit. */

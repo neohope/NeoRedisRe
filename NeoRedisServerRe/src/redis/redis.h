@@ -1012,18 +1012,7 @@ ssize_t syncReadLine(int fd, char *ptr, ssize_t size, PORT_LONGLONG timeout);
 
 /* RDB removed */
 
-/* AOF persistence */
-void flushAppendOnlyFile(int force);
-void feedAppendOnlyFile(struct redisCommand *cmd, int dictid, robj **argv, int argc);
-void aofRemoveTempFile(pid_t childpid);
-int rewriteAppendOnlyFileBackground(void);
-int loadAppendOnlyFile(char *filename);
-void stopAppendOnly(void);
-int startAppendOnly(void);
-void backgroundRewriteDoneHandler(int exitcode, int bysignal);
-void aofRewriteBufferReset(void);
-PORT_ULONG aofRewriteBufferSize(void);
-WIN32_ONLY(void aofProcessDiffRewriteEvents(aeEventLoop* eventLoop);)
+/* AOF persistence removed*/
 
 /* Sorted sets data type */
 
@@ -1200,7 +1189,6 @@ void keysCommand(redisClient *c);
 void scanCommand(redisClient *c);
 void dbsizeCommand(redisClient *c);
 void lastsaveCommand(redisClient *c);
-void bgrewriteaofCommand(redisClient *c);
 void shutdownCommand(redisClient *c);
 void moveCommand(redisClient *c);
 void renameCommand(redisClient *c);
