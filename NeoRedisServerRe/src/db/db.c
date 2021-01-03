@@ -44,11 +44,7 @@ robj *lookupKey(redisDb *db, robj *key) {
     if (de) {
         robj *val = dictGetVal(de);
 
-        /* Update the access time for the ageing algorithm.
-         * Don't do it if we have a saving child, as this will trigger
-         * a copy on write madness. */
-        if (server.rdb_child_pid == -1 && server.aof_child_pid == -1)
-            val->lru = LRU_CLOCK();
+		val->lru = LRU_CLOCK();
         return val;
     } else {
         return NULL;
@@ -254,13 +250,6 @@ void flushallCommand(redisClient *c) {
     signalFlushedDb(-1);
     server.dirty += emptyDb(NULL);
     addReply(c,shared.ok);
-    if (server.rdb_child_pid != -1) {
-#ifdef _WIN32
-        AbortForkOperation();
-#else
-        kill(server.rdb_child_pid,SIGUSR1);
-#endif
-    }
 
     server.dirty++;
 }
@@ -593,7 +582,6 @@ void dbsizeCommand(redisClient *c) {
 }
 
 void lastsaveCommand(redisClient *c) {
-    addReplyLongLong(c,server.lastsave);
 }
 
 void typeCommand(redisClient *c) {
