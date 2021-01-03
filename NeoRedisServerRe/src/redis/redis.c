@@ -35,7 +35,6 @@
 #endif
 
 #include "redis.h"
-#include "../common/io/bio.h"
 
 #include <time.h>
 #include <signal.h>
@@ -1572,7 +1571,6 @@ void initServer(void) {
         server.maxmemory = 3072LL*(1024*1024); /* 3 GB */
         server.maxmemory_policy = REDIS_MAXMEMORY_NO_EVICTION;
     }
-    bioInit();
 }
 
 /* Populates the Redis Command Table starting from the hard coded list

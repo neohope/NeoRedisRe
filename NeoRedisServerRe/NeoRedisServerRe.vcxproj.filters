@@ -75,9 +75,6 @@
     <ClCompile Include="src\common\io\syncio.c">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="src\common\io\bio.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="src\socket\anet.c">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -138,9 +135,6 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="src\event\ae.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="src\common\io\bio.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="src\socket\anet.h">
