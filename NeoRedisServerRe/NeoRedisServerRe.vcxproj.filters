@@ -69,9 +69,6 @@
     <ClCompile Include="src\event\ae.c">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="src\common\io\syncio.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="src\socket\anet.c">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -85,9 +82,6 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="src\redis\util.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="src\redis\hyperloglog.c">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="src\redis\config.c">
