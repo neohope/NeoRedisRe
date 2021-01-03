@@ -176,7 +176,6 @@
     <ClCompile Include="src\common\ds\sds.c" />
     <ClCompile Include="src\common\ds\ziplist.c" />
     <ClCompile Include="src\common\ds\zipmap.c" />
-    <ClCompile Include="src\common\io\rio.c" />
     <ClCompile Include="src\common\io\syncio.c" />
     <ClCompile Include="src\db\db.c" />
     <ClCompile Include="src\event\ae.c" />
@@ -206,7 +205,6 @@
     <ClInclude Include="src\common\ds\sds.h" />
     <ClInclude Include="src\common\ds\ziplist.h" />
     <ClInclude Include="src\common\ds\zipmap.h" />
-    <ClInclude Include="src\common\io\rio.h" />
     <ClInclude Include="src\event\ae.h" />
     <ClInclude Include="src\mem\zmalloc.h" />
     <ClInclude Include="src\redis\config.h" />

@@ -42,9 +42,6 @@
     <ClCompile Include="src\common\ds\zipmap.c">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="src\db\db.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="src\mem\zmalloc.c">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -90,9 +87,6 @@
     <ClCompile Include="src\redis\util.c">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="src\common\io\rio.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="src\redis\hyperloglog.c">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -100,6 +94,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="src\redis\sort.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\db\db.c">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -141,9 +138,6 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="src\redis\util.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="src\common\io\rio.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="src\redis\config.h">
