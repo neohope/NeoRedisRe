@@ -15,13 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\common\algo\bitops.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="src\common\algo\pqsort.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="src\common\ds\adlist.c">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="src\common\ds\dict.c">
@@ -87,11 +81,11 @@
     <ClCompile Include="src\db\db.c">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="src\common\ds\adlist.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\common\ds\adlist.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="src\common\ds\dict.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -126,6 +120,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="src\redis\config.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\common\ds\adlist.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

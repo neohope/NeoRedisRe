@@ -167,7 +167,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\common\algo\bitops.c" />
     <ClCompile Include="src\common\algo\pqsort.c" />
     <ClCompile Include="src\common\ds\adlist.c" />
     <ClCompile Include="src\common\ds\dict.c" />

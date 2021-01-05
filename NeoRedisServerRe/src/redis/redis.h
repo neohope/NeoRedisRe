@@ -1117,8 +1117,6 @@ void psetexCommand(redisClient *c);
 void getCommand(redisClient *c);
 void delCommand(redisClient *c);
 void existsCommand(redisClient *c);
-void setbitCommand(redisClient *c);
-void getbitCommand(redisClient *c);
 void setrangeCommand(redisClient *c);
 void getrangeCommand(redisClient *c);
 void incrCommand(redisClient *c);
@@ -1226,9 +1224,6 @@ void hincrbyfloatCommand(redisClient *c);
 void objectCommand(redisClient *c);
 void clientCommand(redisClient *c);
 void timeCommand(redisClient *c);
-void bitopCommand(redisClient *c);
-void bitcountCommand(redisClient *c);
-void bitposCommand(redisClient *c);
 
 #if defined(__GNUC__)
 void *calloc(size_t count, size_t size) __attribute__ ((deprecated));
