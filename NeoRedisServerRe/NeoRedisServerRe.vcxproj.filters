@@ -30,9 +30,6 @@
     <ClCompile Include="src\common\ds\ziplist.c">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="src\common\ds\zipmap.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="src\mem\zmalloc.c">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -99,9 +96,6 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="src\common\ds\ziplist.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="src\common\ds\zipmap.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="src\mem\zmalloc.h">
